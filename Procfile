@@ -1,1 +1,1 @@
-web: gunicorn qandu_landing.wsgi --log-file -
+web: gunicorn tdunst_final.wsgi --log-file -
