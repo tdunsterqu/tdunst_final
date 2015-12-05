@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+{% for review in review_list %}
+<div class="panel">
+  <h3>{{ review.title }}</h3>
+  <p>Submitted by {{ review.title.username }} on {{review.created_at }}</p>
+</div>
+{% endfor %}
+{% endblock %}
