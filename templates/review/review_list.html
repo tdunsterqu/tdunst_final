@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-{% for review in review_list %}
+{% for review in object_list %}
 <div class="panel">
-  <h3>{{ review.title }}</h3>
+  <h3><a href="{{ review.get_absolute_url }}">{{ review.title }}</a></h3>
   <p>Submitted by {{ review.title.username }} on {{review.created_at }}</p>
 </div>
 {% endfor %}
