@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import PermissionDenied
 from .models import *
 # Create your views here.
 class Home(TemplateView):
@@ -36,10 +37,22 @@ class ReviewUpdateView(UpdateView):
   template_name = "review/review_form.html"
   fields = ['title', 'description']
 
+  def get_object(self, *args, **kwargs):
+    object = super(ReviewUpdateView, self).get_object(*args, **kwargs)
+    if object.user != self.request.user:
+      raise PermissionDenied()
+    return object
+
 class ReviewDeleteView(DeleteView):
   model = Review
   template_name = "review/review_confirm_delete.html"
   success_url = reverse_lazy('review_list')
+
+  def get_object(self, *args, **kwargs):
+    object = super(ReviewDeleteView, self).get_object(*args, **kwargs)
+    if object.user != self.request.user:
+      raise PermissionDenied()
+    return object
 
 class CommentCreateView(CreateView):
   model = Comment
@@ -60,6 +73,12 @@ class CommentUpdateView(UpdateView):
   template_name = "comment/comment_form.html"
   fields = ['text']
 
+  def get_object(self, *args, **kwargs):
+    object = super(CommentUpdateView, self).get_object(*args, **kwargs)
+    if object.user != self.request.user:
+      raise PermissionDenied()
+    return object
+
   def get_success_url(self):
     return self.object.review.get_absolute_url()
 
@@ -67,6 +86,12 @@ class CommentDeleteView(DeleteView):
   model = Comment
   pk_url_kwarg = 'comment_pk'
   template_name = "comment/comment_confirm_delete.html"
+  
+  def get_object(self, *args, **kwargs):
+    object = super(CommentDeleteView, self).get_object(*args, **kwargs)
+    if object.user != self.request.user:
+      raise PermissionDenied()
+    return object
 
   def get_success_url(self):
     return self.object.review.get_absolute_url()
