@@ -1,8 +1,9 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.shortcuts import render, redirect
+from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView, FormView
 from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from .models import *
+from .forms import *
 # Create your views here.
 class Home(TemplateView):
     template_name = "home.html"
@@ -86,7 +87,7 @@ class CommentDeleteView(DeleteView):
   model = Comment
   pk_url_kwarg = 'comment_pk'
   template_name = "comment/comment_confirm_delete.html"
-  
+
   def get_object(self, *args, **kwargs):
     object = super(CommentDeleteView, self).get_object(*args, **kwargs)
     if object.user != self.request.user:
@@ -95,5 +96,19 @@ class CommentDeleteView(DeleteView):
 
   def get_success_url(self):
     return self.object.review.get_absolute_url()
+
+class VoteFormView(FormView):
+  form_class = VoteForm
+
+  def form_valid(self, form):
+    user = self.request.user
+    review = review.objects.get(pk=form.data["review"])
+    prev_votes = Vote.objects.filter(user=user, review=review)
+    has_voted = (prev_votes.count()>0)
+    if not has_voted:
+      Vote.objects.create(user=user, review=review)
+    else:
+      prev_votes[0].delete()
+    return redirect('question_list')
 
 
