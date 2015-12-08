@@ -26,7 +26,8 @@ class Comment(models.Model):
 
 class Vote(models.Model):
   user = models.ForeignKey(User)
-  review = models.ForeignKey(Review)
+  review = models.ForeignKey(Review, blank=True, null=True)
+  comment = models.ForeignKey(Comment, blank=True, null=True)
 
   def __unicode__(self):
     return "%s upvoted" % (self.user.username)
