@@ -136,6 +136,11 @@ class UserDetailView(DetailView):
     context['comments'] = comments
     return context
 
+class SearchReviewListView(ReviewListView):
+  def get_queryset(self):
+    incoming_query_string = self.request.GET.get('query','')
+    return Review.objects.filter(title__icontains=incoming_query_string)
+
 
 
 
