@@ -23,6 +23,12 @@ class ReviewListView(ListView):
   template_name = "review/review_list.html"
   paginate_by = 5
 
+  def get_context_data(self, **kwargs):
+    context = super(ReviewListView, self).get_context_data(**kwargs)
+    user_votes = Review.objects.filter(vote__user=self.request.user)
+    context['user_votes'] = user_votes
+    return context
+
 class ReviewDetailView(DetailView):
   model = Review
   template_name = "review/review_detail.html"
@@ -32,6 +38,8 @@ class ReviewDetailView(DetailView):
     review = Review.objects.get(id=self.kwargs['pk'])
     comments = Comment.objects.filter(review=review)
     context['comments'] = comments
+    user_votes = Comment.objects.filter(vote__user=self.request.user)
+    context['user_votes'] = user_votes
     return context
 
 class ReviewUpdateView(UpdateView):
