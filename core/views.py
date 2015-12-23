@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView, FormView
 from django.core.urlresolvers import reverse_lazy
@@ -40,6 +41,8 @@ class ReviewDetailView(DetailView):
     context['comments'] = comments
     user_votes = Comment.objects.filter(vote__user=self.request.user)
     context['user_votes'] = user_votes
+    rating = Comment.objects.filter(review=review).aggregate(Avg('rating'))
+    context['rating'] = rating
     return context
 
 class ReviewUpdateView(UpdateView):
@@ -67,7 +70,7 @@ class ReviewDeleteView(DeleteView):
 class CommentCreateView(CreateView):
   model = Comment
   template_name = "comment/comment_form.html"
-  fields = ['text']
+  fields = ['text', 'rating']
 
   def get_success_url(self):
     return self.object.review.get_absolute_url()
@@ -81,7 +84,7 @@ class CommentUpdateView(UpdateView):
   model = Comment
   pk_url_kwarg = 'comment_pk'
   template_name = "comment/comment_form.html"
-  fields = ['text']
+  fields = ['text', 'rating']
 
   def get_object(self, *args, **kwargs):
     object = super(CommentUpdateView, self).get_object(*args, **kwargs)
